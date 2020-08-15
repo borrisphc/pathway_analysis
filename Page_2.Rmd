@@ -1,0 +1,94 @@
+<style>
+  .superbigimage{
+      #overflow-x:scroll;
+      overflow-x : scroll; width : 1400px;
+      white-space: nowrap;
+  }
+
+  .superbigimage img{
+     max-width: none;
+  }
+  .image{
+      #overflow-x:scroll;
+      overflow-x : scroll; width : 1400px;
+      white-space: nowrap;
+  }
+
+  .image img{
+     max-width: none;
+  }
+
+  body {
+      position: absolute;
+      left: 0px;}
+
+</style>
+
+
+<div class="superbigimage">
+### Heatmap Plot
+```{r ,echo=FALSE, message=FALSE, fig.width=20*2,fig.height= 8,warning=FALSE}
+#emapplot(res) 
+library("clusterProfiler")
+#library("tidyverse")
+library("ggplot2")
+library("enrichplot")
+library("org.Hs.eg.db")
+library("org.Mm.eg.db")
+
+#data(params$pathway_res)
+#edox <- setReadable(res, 'org.Hs.eg.db', 'ENTREZID')
+#edox <- setReadable(res, params$data()%>% as.character(), 'ENTREZID')
+heatplot(edox)
+```
+</div>
+### Summary Table
+
+
+
+<div class="image">
+```{r ,echo=FALSE, message=FALSE, warning=FALSE}
+#library("tidyverse")
+
+transkegg <- function(x, sp){
+  tbl <-  bitr( unlist( strsplit(x,split = "/" ) ) ,
+                fromType="ENTREZID", #输入为SYMBOL格式
+                toType= "SYMBOL",  # 转为ENTERZID格式
+                OrgDb= sp )
+  paste( tbl$SYMBOL  , collapse = "/")
+}
+
+
+library(DT)
+res <- res@result[order(res@result[,6]), ]
+res[,c(5:7)] <- format(res[,c(5:7)], digits = 2 , scientific = T)
+colnames(res)[5:7] <- c("p-value","adjusted p-value","q-value")
+res$geneID <- toupper(res$geneID)
+if ( type == "kegg" ){
+  res[,2] <- paste('<a href="https://www.genome.jp/dbget-bin/www_bget?pathway:',
+                                                     res[,1],
+                                                     '" target="_blank">',
+                                                     res[,2],
+                                                     '</a>', sep = ""  )
+  res$geneID <- transkegg(res$geneID, sp = species)                                                  
+} else {
+   res[,2] <- paste('<a href="http://amigo.geneontology.org/amigo/term/',
+                                                     res[,1],
+                                                     '" target="_blank">',
+                                                     res[,2],
+                                                     '</a>', sep = ""  )
+}
+
+
+datatable(res[,-1], extensions = c('FixedColumns','Buttons'),
+          escape = F, # for hyper link
+  options = list(
+   dom = 'Bfrtip',
+   autoWidth = TRUE,
+   scrollX = TRUE,
+   buttons = c( 'csv', 'excel'),
+   columnDefs = (list(list(width = '200px', targets =c(1)), list(width = '60px', targets =c(4,5,6))))
+  )) 
+```
+
+</div>

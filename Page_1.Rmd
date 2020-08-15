@@ -1,0 +1,43 @@
+---
+title: ""
+output: html_document
+---
+
+<style>
+body {
+    position: absolute;
+    left: 0px;}
+</style>
+
+```{r ,echo=FALSE, message=FALSE, warning=FALSE}
+library("clusterProfiler")
+#library("tidyverse")
+library("ggplot2")
+library("org.Hs.eg.db")
+library("enrichplot")
+library("plotly")
+#data(params$pathway_res )
+```
+
+
+### Bar Plot
+```{r ,echo=FALSE, message=FALSE, warning=FALSE, fig.width=12,fig.height= 8}
+
+barplot(res, showCategory=15) %>% ggplotly()
+```
+
+
+### Dot Plot
+```{r ,echo=FALSE, message=FALSE, warning=FALSE, fig.width=12,fig.height= 8}
+
+dotplot(res, showCategory=15) %>% ggplotly()
+```
+
+
+### Enrichment map plot
+```{r ,echo=FALSE, message=FALSE, warning=FALSE, fig.width=12,fig.height=12}
+if(nrow(summary(res))!=1){
+  emapplot(res, pie_scale=1.5,layout="kk") 
+} 
+#edox <- setReadable(res, 'org.Hs.eg.db', 'ENTREZID')
+```
